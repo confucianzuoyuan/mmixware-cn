@@ -1,6 +1,6 @@
-\section{简介}
+\chapter{简介}
 
-\subsection{}
+\section{}
 该程序是超可配置MMIX流水线的元模拟器的核心：它定义了MMIX运行例程，它完成了大部分工作。另一个例程MMIX\_init也在这里定义，还有一个名为mmix\_pipe.h的头文件。头文件由主例程和其他例程（如MMIX\_config）使用，它们是单独编译的。
 
 该程序的读者应该熟悉MMMIX主程序模块中对MMIX体系结构的解释。
@@ -9,7 +9,7 @@
 
 当人们意识到当前的程序有朝一日可能会被用于MMIX的C编译器翻译并用于模拟自身时，这有点令人难以置信。
 
-\subsection{}
+\section{}
 MMIX的这种高性能原型通过“流水线”实现其效率，这是一种重叠技术，在Hennessy \& Patterson的著作《计算机体系结构》（第二版）的第3章中对相关的DLX计算机进行了解释。也使用了其他技术，例如该书第4章中解释的“动态调度”和“多发射”。
 
 可视化该过程的一种好方法是想象有人根据类似的原则组织了一家高科技汽车维修店。有八个独立的功能单元，我们可以将其视为八组汽车机械师，每组专门从事一项特定的任务；每个小组都有自己的工作空间，一次可以处理一辆车。F组（“取”组）负责召集客户，让他们有条不紊地进入流水线车库。D组（“解码和调度”组）进行初始车辆检查并写下解释需要何种服务的订单。这些车辆位于四个“执行”组之一：X组负责日常维护，而XF、XM和XD组是更复杂任务的专家，这些任务往往需要更长的时间。（XF的人擅长打分，而XM和XD组是多连杆悬架和差速器方面的专家。）当相关的X组完成工作后，汽车开到M站，在那里他们发送或接收消息，可能付钱给“记忆”组的成员。最后，所有必要的零件都由W组（“写”组）的成员安装，汽车离开了车间。一切都井井有条，因此在大多数情况下，汽车以同步的方式从一个车站移动到另一个车站，每隔100纳米世纪。
@@ -22,7 +22,7 @@ MMIX的这种高性能原型通过“流水线”实现其效率，这是一种�
 
 事实上，这个程序是为多种管道的实验而设计的，可能会使用额外的功能单元（例如几个独立的X组），并且可能同时获取、分派和执行多个非冲突指令。这种复杂性使得这个程序比一个简单的管道模拟器更难，但它们也使它更具指导性，因为如果我们需要更普遍地处理它们，我们可以更好地理解所涉及的问题。
 
-\subsection{}
+\section{}
 这是当前程序模块的总体结构。
 <<mmix-pipe.c>>=
 #include <stdio.h>
@@ -39,13 +39,13 @@ MMIX的这种高性能原型通过“流水线”实现其效率，这是一种�
   <<External routines>>
 @
 
-\subsection{}
+\section{}
 标识符Extern在MMIX-PIPE中用于声明在其他模块中访问的变量。实际上这里所有出现的“Extern”都定义为空白，但是“Extern”在头文件中会变成“extern”。
 <<External variables>>=
   Extern int verbose;
 @
 
-\subsection{}
+\section{}
 头文件重复基本定义和声明。
 <<mmix-pipe.h>>=
 #define Extern extern
@@ -55,7 +55,7 @@ MMIX的这种高性能原型通过“流水线”实现其效率，这是一种�
   <<External prototypes>>
 @
 
-\subsection{}
+\section{}
 该程序的子程序首先用原型声明，如在ANSI C中，然后用旧式C函数定义。以下预处理器命令使新式和旧式编译器都能正常工作。
 <<Header definitions>>=
 #ifdef __STDC__
@@ -65,7 +65,7 @@ MMIX的这种高性能原型通过“流水线”实现其效率，这是一种�
 #endif
 @
 
-\subsection{}
+\section{}
 该程序的一些自然名称与作者测试中至少一台主机上的库名称冲突。所以我们在这里绕过库名。
 <<Header definitions>>=
 #define random my_random
@@ -73,7 +73,7 @@ MMIX的这种高性能原型通过“流水线”实现其效率，这是一种�
 #define div my_div
 @
 
-\subsection{}
+\section{}
 详细程度取决于以下位代码。
 <<Header definitions>>=
 #define issue_bit (1 << 0)
@@ -87,14 +87,14 @@ MMIX的这种高性能原型通过“流水线”实现其效率，这是一种�
 #define show_wholecache_bit (1 << 8)
 @
 
-\subsection{}
+\section{}
 MMIX\_init()例程应该只调用一次，在MMIX\_config()完成其工作之后但在模拟器开始执行任何程序之前。然后MMIX\_run可以按用户喜欢的频率调用。
 <<External prototypes>>=
   Extern void MMIX_init ARGS((void));
   Extern void MMIX_run ARGS((int cycs, octa breakpoint));
 @
 
-\subsection{}
+\section{}
 <<External routines>>=
 void MMIX_init()
 {
@@ -123,23 +123,23 @@ cease: ;
 }
 @
 
-\subsection{}
+\section{}
 <<Type definitions>>=
   typedef enum {
     false,true,wow
   } bool;
 @
 
-\subsection{}
+\section{}
 <<Local variables>>=
   register int i, j, m;
   bool breakpoint_hit = false;
   bool halted = false;
 @
 
-\subsection{}
+\section{}
 中止此程序的错误消息称为恐慌消息。除非该程序内部不一致，否则永远不需要称为混淆的宏。
-<<*>>=
+<<mmix-pipe.c>>=
 #define errprint0(f) fprintf(stderr,f)
 #define errprint1(f,a) fprintf(stderr,f,a)
 #define errprint2(f,a,b) fprintf(stderr,f,a,b)
@@ -151,7 +151,7 @@ cease: ;
   static breakpoint expire ARGS((void));
 @
 
-\subsection{}
+\section{}
 <<Subroutines>>=
 static void expire()
 {
@@ -161,17 +161,17 @@ static void expire()
 }
 @
 
-\subsection{}
+\section{}
 这个程序的数据结构并不完全等同于可以直接在硅上实现的逻辑门；我们将使用适合C编程语言的数据结构和算法。例如，我们将使用指针和数组，而不是总线、端口和锁存器。但是，我们的数据结构和算法的净效应旨在等同于硅实现的净效应。下面使用的方法基本上等同于今天在真实机器中使用的方法，只是添加了诊断工具，以便我们可以轻松地观察正在发生的事情。
 
 MMIX流水线中的每个功能单元在此处被编程为C中的协程。在每个时钟周期，我们将调用每个活动协程执行其操作的一个阶段；就主程序中描述的维修站类比而言，这对应于让每组汽车修理工在汽车上进行一个操作单元。协同程序是按顺序执行的，尽管真正的管道会让它们并行运行。我们不会通过让一个协程在其周期早期访问另一个协程在其周期后期计算的值来“作弊”，除非计算机硬件可以以等效的方式“作弊”。
 
-\section{底层过程}
+\chapter{底层过程}
 
-\subsection{}
+\section{}
 我们应该从哪里开始？从模拟器的全局视图开始，然后将其分解为组件部分是很诱人的。但是这个任务太艰巨了，因为在我们构建更大的组件时，关于应该组合哪些基本成分还有很多未知数。因此，让我们首先看一下构建上层建筑的基本操作。一旦我们创建了一些基础设施，我们将能够满怀信心地继续处理未来的更大任务。
 
-\subsection{}
+\section{}
 这个64位MMIX架构的程序基于32位整数运算，因为在撰写本文时（1998-1999），几乎所有作者可用的计算机都受到这种方式的限制。基本算术的详细信息出现在名为MMIX-ARITH的单独程序模块中，因为汇编器和非流水线模拟器也需要相同的例程。如有必要，应更改tetra类型的定义以符合那里的定义。
 <<Type definitions>>=
 typedef unsigned int tetra;
@@ -180,12 +180,12 @@ typedef struct {
 } octa;
 @
 
-\subsection{}
+\section{}
 <<Internal prototypes>>=
 static void print_octa ARGS((octa));
 @
 
-\subsection{}
+\section{}
 <<Subroutines>>=
 static void print_octa(o)
     octa o;
@@ -194,7 +194,7 @@ static void print_octa(o)
 }
 @
 
-\subsection{}
+\section{}
 <<Global variables>>=
 extern octa zero_octa;
 extern octa neg_one;
